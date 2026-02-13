@@ -1,0 +1,21 @@
+{
+  "name": "bradp/wordpress-pattern-category-phpcs",
+  "description": "PHPCS sniffs for enforcing categories in WordPress block pattern files.",
+  "type": "phpcodesniffer-standard",
+  "license": "MIT",
+  "keywords": [
+    "phpcs",
+    "standards",
+    "wordpress"
+  ],
+  "authors": [
+    {
+      "name": "Brad Parbs",
+      "email": "brad@bradparbs.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.4",
+    "squizlabs/php_codesniffer": "^3.0"
+  }
+}

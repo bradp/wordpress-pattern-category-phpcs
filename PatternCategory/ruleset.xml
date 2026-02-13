@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<ruleset name="PatternCategory">
+	<description>Custom PHPCS sniffs for WordPress block pattern files.</description>
+</ruleset>
