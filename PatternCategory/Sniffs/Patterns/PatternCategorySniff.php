@@ -18,7 +18,7 @@ class PatternCategorySniff implements Sniff {
 	 * The required base category that must appear in the Categories header.
 	 *
 	 * Set via the PHPCS ruleset configuration:
-	 * <property name="base-category" value="my-base-category" />
+	 * <property name="base_category" value="my-base-category" />
 	 *
 	 * @var string
 	 */
