@@ -3,7 +3,7 @@
  * Sniff to enforce the Categories header in WordPress block pattern files.
  *
  * Checks that pattern files contain a valid file-level docblock with a
- * "Categories:" property that includes the required base category.
+ * "Categories:" property that includes at least one required category.
  */
 
 namespace PatternCategory\Sniffs\Patterns;
@@ -15,7 +15,7 @@ class PatternCategorySniff implements Sniff {
 
 
 	/**
-	 * The required base category that must appear in the Categories header.
+	 * A required category that must appear in the Categories header.
 	 *
 	 * Set via the PHPCS ruleset configuration:
 	 * <property name="base_category" value="my-base-category" />
@@ -23,6 +23,18 @@ class PatternCategorySniff implements Sniff {
 	 * @var string
 	 */
 	public $base_category = '';
+
+	/**
+	 * A comma-separated list of allowed required categories.
+	 *
+	 * Set via the PHPCS ruleset configuration:
+	 * <property name="base_categories" value="cat-one, cat-two" />
+	 *
+	 * If configured, the pattern must include at least one of these categories.
+	 *
+	 * @var string
+	 */
+	public $base_categories = '';
 
 	/**
 	 * Returns an array of tokens this sniff wants to listen for.
@@ -70,19 +82,51 @@ class PatternCategorySniff implements Sniff {
 			return $phpcsFile->numTokens;
 		}
 
-		$categoriesRaw = $matches[1];
-		$categories    = array_map( 'trim', explode( ',', $categoriesRaw ) );
+		$categoriesRaw       = $matches[1];
+		$categories          = array_filter( array_map( 'trim', explode( ',', $categoriesRaw ) ) );
+		$normalizedCategories = array_map( 'strtolower', $categories );
+		$requiredCategories   = $this->getRequiredCategories();
 
-		// Check that the base category is present.
-		if ( $this->base_category !== '' && ! in_array( strtolower( $this->base_category ), array_map( 'strtolower', $categories ), true ) ) {
+		// Check that at least one configured category is present.
+		if ( [] !== $requiredCategories && [] === array_intersect( $requiredCategories, $normalizedCategories ) ) {
 			$phpcsFile->addError(
-				'Pattern file Categories must include the base category "%s". Found: %s',
+				'Pattern file Categories must include at least one required category: %s. Found: %s',
 				$stackPtr,
 				'MissingBaseCategory',
-				[ $this->base_category, $categoriesRaw ]
+				[ implode( ', ', $requiredCategories ), $categoriesRaw ]
 			);
 		}
 
 		return $phpcsFile->numTokens;
+	}
+
+	/**
+	 * Returns the configured required categories in normalized form.
+	 *
+	 * Supports both the legacy single-category property and the new
+	 * comma-separated multi-category property.
+	 *
+	 * @return string[]
+	 */
+	private function getRequiredCategories() {
+		$requiredCategories = [];
+
+		if ( '' !== trim( $this->base_category ) ) {
+			$requiredCategories[] = trim( strtolower( $this->base_category ) );
+		}
+
+		if ( '' !== trim( $this->base_categories ) ) {
+			$requiredCategories = array_merge(
+				$requiredCategories,
+				array_filter(
+					array_map(
+						'trim',
+						array_map( 'strtolower', explode( ',', $this->base_categories ) )
+					)
+				)
+			);
+		}
+
+		return array_values( array_unique( $requiredCategories ) );
 	}
 }

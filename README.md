@@ -15,6 +15,16 @@ Add the rule to your project's `phpcs.xml` or `.phpcs.xml.dist`:
 ```xml
 <rule ref="PatternCategory.Patterns.PatternCategory">
     <properties>
+        <property name="base_categories" value="your-category, another-category" />
+    </properties>
+</rule>
+```
+
+The legacy single-category property still works:
+
+```xml
+<rule ref="PatternCategory.Patterns.PatternCategory">
+    <properties>
         <property name="base_category" value="your-category" />
     </properties>
 </rule>
@@ -26,7 +36,7 @@ The sniff validates that WordPress block pattern files contain a file-level docb
 
 1. **Missing docblock** — The pattern file must have a `/** ... */` docblock near the top.
 2. **Missing Categories** — The docblock must include a `Categories:` line.
-3. **Missing base category** — If `base_category` is configured, it must appear in the comma-separated list of categories.
+3. **Missing required category** — If `base_category` or `base_categories` is configured, the pattern must include at least one configured category in the comma-separated list.
 
 ### Example of a valid pattern file
 
